@@ -1,0 +1,139 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter; 
+import java.io.IOException; 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+//  Comment 
+
+public class filter 
+{
+	static String[] Special_Str = {"Media:" , "Special:" , "Talk:" , "User:", "User_talk","Project:", "Project_talk:",
+			                       "File:", "MediaWiki:","MediaWiki_talk:","Template:","Template_talk:", 
+			                       "Help:","Help_talk:", "Category:", "Category_talk:", "Portal:","Wikipedia:", "Wikipedia_talk"};
+    static String[] Image_Str   = {".jpg", ".gif", ".png", ".JPG", ".GIF", ".PNG", ".txt", ".ico"};
+    static String[] Boil_Str    = {"404_error/", "Main_Page", "Hypertext_Transfer_Protocol", "Facicon.ico", "Search"};
+	static String[] parts; 
+    static TreeMap<String, String> Tree_Map = new TreeMap<String, String>();
+	
+	public static void main(String[] args)
+	{
+		ReadFile();
+	    AfterFilterFile();
+	}
+
+	public static boolean Filter(String str)
+	{
+	    parts = str.split(" ");
+		if(IsEnglish(parts[0]) && (!IsSpecial(parts[1])) && IsUpper(parts[1])
+		  && (!IsImage(parts[1])) && (!IsBoilplate(parts[1]))) 
+			return true;
+		else
+			return false; 
+	}
+
+// Type starts begin en , and the length just 2, without suffix 
+	public static boolean IsEnglish(String str)
+	{
+	    if(str.startsWith("en") || str.startsWith("EN") || str.startsWith("eN") || str.startsWith("En"))
+		    return true;
+	    else
+		    return false;	
+	}
+
+	public static boolean IsSpecial(String str)
+	{
+		int len = Special_Str.length;
+		for(int i = 0; i < len; i++)
+		{
+			if(str.startsWith(Special_Str[i]))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean IsUpper(String str)
+	{
+		if((str.charAt(0) > 'a') && (str.charAt(0) < 'z'))
+		    return false;
+		else 
+			return true;		
+	}
+
+	public static boolean IsImage(String str)
+	{
+		int len = Image_Str.length;
+		for(int i = 0; i < len; i++)
+		{
+			if(str.endsWith(Image_Str[i]))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean IsBoilplate(String str)
+	{
+		int len = Boil_Str.length;
+		for(int i = 0; i < len; i++)
+		{
+			if(str.equals(Boil_Str[i]))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static void ReadFile()
+	{
+		try
+		{
+		//   FileReader reader = new FileReader("/home/yujing/workspace/15619_CC/src/pagecounts-20140701-000000");
+			  FileReader reader = new FileReader("pagecounts-20140701-000000");
+		   BufferedReader br = new BufferedReader(reader);
+		   
+		   String str = null;
+		   
+		   while((str = br.readLine()) != null)
+		   {
+			   if(Filter(str) == true)
+			   {
+				 Tree_Map.put(parts[2], parts[1]);
+			     System.out.println(str);
+			   }
+		   }
+	
+		   br.close();
+		   reader.close();	
+	  }
+		catch(FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	public static void AfterFilterFile()
+	{
+		
+		try {
+			FileWriter writer = new FileWriter("Res.txt");
+			BufferedWriter bw = new BufferedWriter(writer);
+		} 
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+}
